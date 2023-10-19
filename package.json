@@ -25,5 +25,5 @@
     "build:html": "esbuild --minify src/register.ts | bin/replace.ts > simpleTcp.html",
     "build:ts": "esbuild --bundle --outdir=. --platform=node src/simpleTcp.ts"
   },
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
