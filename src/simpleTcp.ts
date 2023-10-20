@@ -9,25 +9,34 @@ import type { NodeAPI, NodeDef, NodeMessage, Node as NodeRed } from 'node-red'
 export default function (RED: NodeAPI) {
   function simpleTcp(
     this: NodeRed,
-    def: NodeDef & Partial<{ port: number; host: string }>,
+    def: NodeDef & Partial<{ port: string; host: string; timeout: string }>,
   ) {
-    let host: string
-    let port: number
-    try {
-      host = parse(string(), def.host)
-      port = parse(number([integer()]), def.port)
-    } catch (error) {
-      return this.error(error)
-    }
-
     RED.nodes.createNode(this, def)
 
     this.on('input', (msg: NodeMessage) => {
+      let host: string
+      try {
+        host = parse(string(), def.host)
+      } catch (error) {
+        return this.error('"host" is not defined.')
+      }
+      let port: number
+      try {
+        port = parse(number([integer()]), Number(def.port))
+      } catch (error) {
+        return this.error('"port" must be a valid integer.')
+      }
+      let timeout: number
+      try {
+        timeout = parse(number([integer()]), Number(def.timeout))
+      } catch (error) {
+        return this.error('"timeout" must be a valid integer.')
+      }
       let payload: string
       try {
-        parse(string(), msg.payload)
+        payload = parse(string(), msg.payload)
       } catch (error) {
-        return this.error(error)
+        return this.error('"payload" is not defined.')
       }
 
       const socket = new net.Socket()
@@ -39,6 +48,12 @@ export default function (RED: NodeAPI) {
             this.error(err)
           }
         })
+      })
+
+      socket.setTimeout(timeout)
+      socket.on('timeout', () => {
+        socket.destroy()
+        this.error('Timed out while waiting for data.')
       })
 
       socket.on('error', (err) => {

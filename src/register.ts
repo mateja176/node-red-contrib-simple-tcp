@@ -3,13 +3,15 @@
 import type { EditorNodePropertyDef } from 'node-red'
 
 const defaults = {
-  name: { value: 'Simple TCP' },
-  host: { value: '255.255.255.255' },
-  port: { value: 1234 },
+  name: { value: '' },
+  host: { value: '255.255.255.255', required: true },
+  port: { value: 1234, required: true },
+  timeout: { value: 2000 },
 } satisfies {
   name: EditorNodePropertyDef<string>
   host: EditorNodePropertyDef<string>
   port: EditorNodePropertyDef<number>
+  timeout: EditorNodePropertyDef<number>
 }
 
 RED.nodes.registerType('simpleTcp', {
@@ -18,8 +20,8 @@ RED.nodes.registerType('simpleTcp', {
   defaults,
   inputs: 1,
   outputs: 1,
-  icon: 'icon.svg',
   label: function () {
-    return this.name || defaults.name.value
+    return this.name || 'simple tcp'
   },
+  icon: 'icon.png',
 })

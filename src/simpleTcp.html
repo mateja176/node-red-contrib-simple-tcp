@@ -4,11 +4,21 @@
 
 <script type="text/html" data-template-name="simpleTcp">
   <div class="form-row">
-    <label for="host-input"><i class="fa fa-tag"></i>Host</label>
-    <input type="text" id="host-input" placeholder="255.255.255.255" />
+    <label for="node-input-host"><i class="fa fa-server"></i> Host</label>
+    <input type="text" id="node-input-host" placeholder="255.255.255.255" />
   </div>
   <div class="form-row">
-    <label for="port-input"><i class="fa fa-tag"></i>Port</label>
-    <input type="number" id="port-input" placeholder="1234" />
+    <label for="node-input-port"><i class="fa fa-hashtag"></i> Port</label>
+    <input type="number" id="node-input-port" placeholder="1234" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-timeout"
+      ><i class="fa fa-hourglass-start"></i> Timeout Milliseconds</label
+    >
+    <input type="number" id="node-input-timeout" placeholder="2000" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-port" placeholder="simple tcp" />
   </div>
 </script>
