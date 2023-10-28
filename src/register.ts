@@ -4,8 +4,8 @@ import type { EditorNodePropertyDef } from 'node-red'
 
 const defaults = {
   name: { value: '' },
-  host: { value: '255.255.255.255', required: true },
-  port: { value: 1234, required: true },
+  host: { value: '255.255.255.255' },
+  port: { value: 1234 },
   timeout: { value: 2000 },
 } satisfies {
   name: EditorNodePropertyDef<string>

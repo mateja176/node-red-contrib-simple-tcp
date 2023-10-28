@@ -6,23 +6,26 @@ import net from 'net'
 import { integer, number, parse, string } from 'valibot'
 import type { NodeAPI, NodeDef, NodeMessage, Node as NodeRed } from 'node-red'
 
+interface TcpConfig {
+  port: string
+  host: string
+}
 export default function (RED: NodeAPI) {
   function simpleTcp(
     this: NodeRed,
-    def: NodeDef & Partial<{ port: string; host: string; timeout: string }>,
+    def: NodeDef & Partial<TcpConfig & { timeout: string }>,
   ) {
     RED.nodes.createNode(this, def)
 
-    this.on('input', (msg: NodeMessage) => {
-      let host: string
-      try {
-        host = parse(string(), def.host)
-      } catch (error) {
+    this.on('input', (message: NodeMessage) => {
+      const msg = message as NodeMessage & Partial<TcpConfig>
+      const host = def.host || msg.host
+      if (!host) {
         return this.error('"host" is not defined.')
       }
       let port: number
       try {
-        port = parse(number([integer()]), Number(def.port))
+        port = parse(number([integer()]), Number(def.port || msg.port))
       } catch (error) {
         return this.error('"port" must be a valid integer.')
       }
