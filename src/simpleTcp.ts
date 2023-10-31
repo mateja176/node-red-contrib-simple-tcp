@@ -19,13 +19,13 @@ export default function (RED: NodeAPI) {
 
     this.on('input', (message: NodeMessage) => {
       const msg = message as NodeMessage & Partial<TcpConfig>
-      const host = def.host || msg.host
+      const host = msg.host || def.host
       if (!host) {
         return this.error('"host" is not defined.')
       }
       let port: number
       try {
-        port = parse(number([integer()]), Number(def.port || msg.port))
+        port = parse(number([integer()]), Number(msg.port || def.port))
       } catch (error) {
         return this.error('"port" must be a valid integer.')
       }
