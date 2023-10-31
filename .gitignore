@@ -1,5 +1,7 @@
 *.js
-!/src/*.js
+!src/*.js
 *.html
-!/src/*.html
+!src/*.html
+icons/*
+!/icons/*.svg
 node_modules

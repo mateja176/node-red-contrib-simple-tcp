@@ -20,8 +20,9 @@
     }
   },
   "scripts": {
-    "build": "concurrently --kill-others-on-fail -g -n html,ts -c cyan,magenta yarn:build:html yarn:build:ts",
+    "build": "concurrently --kill-others-on-fail -g -n html,ts -c magenta,cyan,blue yarn:build:html yarn:build:ts yarn:build:icon",
     "build:html": "esbuild --minify src/register.ts | bin/replace.ts > simpleTcp.html",
+    "build:icon": "inkscape -w 40 -h 40 icons/simpleTcp.svg -o icons/simpleTcp.png && convert icons/simpleTcp.png -gravity center -background none -extent 40x60 icons/simpleTcp.png",
     "build:ts": "esbuild --bundle --outdir=. --platform=node src/simpleTcp.ts"
   }
 }
