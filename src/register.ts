@@ -23,5 +23,5 @@ RED.nodes.registerType('simpleTcp', {
   label: function () {
     return this.name || 'simple tcp'
   },
-  icon: 'icons/simpleTcp.png',
+  icon: 'simpleTcp.png',
 })
