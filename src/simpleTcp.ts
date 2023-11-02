@@ -21,31 +21,25 @@ export default function (RED: NodeAPI) {
       const msg = message as NodeMessage & Partial<TcpConfig>
       const host = msg.host || def.host
       if (!host) {
-        return this.error({ ...msg, error: '"host" is not defined.' })
+        return this.error('"host" is not defined.', msg)
       }
       let port: number
       try {
         port = parse(number([integer()]), Number(msg.port || def.port))
       } catch (error) {
-        return this.error({
-          ...msg,
-          error: '"port" must be a valid integer.',
-        })
+        return this.error('"port" must be a valid integer.', msg)
       }
       let timeout: number
       try {
         timeout = parse(number([integer()]), Number(def.timeout))
       } catch (error) {
-        return this.error({
-          ...msg,
-          error: '"timeout" must be a valid integer.',
-        })
+        return this.error('"timeout" must be a valid integer.', msg)
       }
       let payload: string
       try {
         payload = parse(string(), msg.payload)
       } catch (error) {
-        return this.error({ ...msg, error: '"payload" is not defined.' })
+        return this.error('"payload" is not defined.', msg)
       }
 
       const socket = new net.Socket()
@@ -54,7 +48,7 @@ export default function (RED: NodeAPI) {
         socket.write(payload, (error) => {
           if (error) {
             socket.destroy()
-            this.error({ ...msg, error })
+            this.error(error, msg)
           }
         })
       })
@@ -62,7 +56,7 @@ export default function (RED: NodeAPI) {
       socket.setTimeout(timeout)
       socket.on('timeout', () => {
         socket.destroy()
-        this.error({ ...msg, error: 'Timed out while waiting for data.' })
+        this.error('Timed out while waiting for data.', msg)
       })
 
       socket.on('error', (error) => {
