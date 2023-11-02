@@ -21,7 +21,7 @@ export default function (RED: NodeAPI) {
       const msg = message as NodeMessage & Partial<TcpConfig>
       const host = msg.host || def.host
       if (!host) {
-        return this.error({ ...msg, payload: '"host" is not defined.' })
+        return this.error({ ...msg, error: '"host" is not defined.' })
       }
       let port: number
       try {
@@ -29,7 +29,7 @@ export default function (RED: NodeAPI) {
       } catch (error) {
         return this.error({
           ...msg,
-          payload: '"port" must be a valid integer.',
+          error: '"port" must be a valid integer.',
         })
       }
       let timeout: number
@@ -38,14 +38,14 @@ export default function (RED: NodeAPI) {
       } catch (error) {
         return this.error({
           ...msg,
-          payload: '"timeout" must be a valid integer.',
+          error: '"timeout" must be a valid integer.',
         })
       }
       let payload: string
       try {
         payload = parse(string(), msg.payload)
       } catch (error) {
-        return this.error({ ...msg, payload: '"payload" is not defined.' })
+        return this.error({ ...msg, error: '"payload" is not defined.' })
       }
 
       const socket = new net.Socket()
@@ -54,7 +54,7 @@ export default function (RED: NodeAPI) {
         socket.write(payload, (error) => {
           if (error) {
             socket.destroy()
-            this.error({ ...msg, payload: error })
+            this.error({ ...msg, error })
           }
         })
       })
@@ -62,13 +62,13 @@ export default function (RED: NodeAPI) {
       socket.setTimeout(timeout)
       socket.on('timeout', () => {
         socket.destroy()
-        this.error({ ...msg, payload: 'Timed out while waiting for data.' })
+        this.error({ ...msg, error: 'Timed out while waiting for data.' })
       })
 
       socket.on('error', (error) => {
         // * connection error or communication error
         socket.destroy()
-        this.error({ ...msg, payload: error })
+        this.error({ ...msg, error })
       })
 
       socket.on('data', (data) => {
