@@ -21,34 +21,40 @@ export default function (RED: NodeAPI) {
       const msg = message as NodeMessage & Partial<TcpConfig>
       const host = msg.host || def.host
       if (!host) {
-        return this.error('"host" is not defined.')
+        return this.error({ ...msg, payload: '"host" is not defined.' })
       }
       let port: number
       try {
         port = parse(number([integer()]), Number(msg.port || def.port))
       } catch (error) {
-        return this.error('"port" must be a valid integer.')
+        return this.error({
+          ...msg,
+          payload: '"port" must be a valid integer.',
+        })
       }
       let timeout: number
       try {
         timeout = parse(number([integer()]), Number(def.timeout))
       } catch (error) {
-        return this.error('"timeout" must be a valid integer.')
+        return this.error({
+          ...msg,
+          payload: '"timeout" must be a valid integer.',
+        })
       }
       let payload: string
       try {
         payload = parse(string(), msg.payload)
       } catch (error) {
-        return this.error('"payload" is not defined.')
+        return this.error({ ...msg, payload: '"payload" is not defined.' })
       }
 
       const socket = new net.Socket()
 
       socket.connect(port, host, () => {
-        socket.write(payload, (err) => {
-          if (err) {
+        socket.write(payload, (error) => {
+          if (error) {
             socket.destroy()
-            this.error(err)
+            this.error({ ...msg, payload: error })
           }
         })
       })
@@ -56,13 +62,13 @@ export default function (RED: NodeAPI) {
       socket.setTimeout(timeout)
       socket.on('timeout', () => {
         socket.destroy()
-        this.error('Timed out while waiting for data.')
+        this.error({ ...msg, payload: 'Timed out while waiting for data.' })
       })
 
-      socket.on('error', (err) => {
+      socket.on('error', (error) => {
         // * connection error or communication error
         socket.destroy()
-        this.error(err)
+        this.error({ ...msg, payload: error })
       })
 
       socket.on('data', (data) => {
