@@ -17,15 +17,17 @@ export default function (RED: NodeAPI) {
   ) {
     RED.nodes.createNode(this, def)
 
-    this.on('input', (message: NodeMessage) => {
-      const msg = message as NodeMessage & Partial<TcpConfig>
-      const host = msg.host || def.host
-      if (!host) {
-        return this.error('"host" is not defined.', msg)
+    this.on('input', (msg) => {
+      const host = 'host' in msg ? msg.host : def.host
+      if (typeof host !== 'string' || !host) {
+        return this.error('"host" must be a non-empty string.', msg)
       }
       let port: number
       try {
-        port = parse(number([integer()]), Number(msg.port || def.port))
+        port = parse(
+          number([integer()]),
+          Number('port' in msg ? msg.port : def.port),
+        )
       } catch (error) {
         return this.error('"port" must be a valid integer.', msg)
       }
@@ -35,11 +37,9 @@ export default function (RED: NodeAPI) {
       } catch (error) {
         return this.error('"timeout" must be a valid integer.', msg)
       }
-      let payload: string
-      try {
-        payload = parse(string(), msg.payload)
-      } catch (error) {
-        return this.error('"payload" is not defined.', msg)
+      const { payload } = msg
+      if (typeof payload !== 'string') {
+        return this.error('"payload" must be a string.', msg)
       }
 
       const socket = new net.Socket()
