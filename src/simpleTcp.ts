@@ -3,7 +3,7 @@
 /* eslint-disable immutable/no-this */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import net from 'net'
-import { integer, number, parse, string } from 'valibot'
+import { integer, number, parse } from 'valibot'
 import type { NodeAPI, NodeDef, NodeMessage, Node as NodeRed } from 'node-red'
 
 interface TcpConfig {
@@ -48,7 +48,10 @@ export default function (RED: NodeAPI) {
         socket.write(payload, (error) => {
           if (error) {
             socket.destroy()
-            this.error(error, msg)
+            this.error(error.message, {
+              ...msg,
+              errorObject: error,
+            } as NodeMessage)
           }
         })
       })
@@ -62,7 +65,7 @@ export default function (RED: NodeAPI) {
       socket.on('error', (error) => {
         // * connection error or communication error
         socket.destroy()
-        this.error({ ...msg, error })
+        this.error(error.message, { ...msg, errorObject: error } as NodeMessage)
       })
 
       socket.on('data', (data) => {
